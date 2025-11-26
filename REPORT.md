@@ -132,6 +132,63 @@ Summarize what you learned about:
 - Web Service: http://localhost:4444/swagger-ui.html
 
 ---
+## 9. Bonus 2: 10. Circuit Breaker Pattern
+
+**Implementación:** Spring Cloud Circuit Breaker con Resilience4j
+
+### Descripción
+Se ha implementado el patrón Circuit Breaker para prevenir fallos en cascada cuando el servicio de accounts no está disponible.
+
+### Detalles de implementación
+
+#### 1. Dependencias añadidas
+Se han añadido las dependencias de Resilence4j en el `build.gradle.kts` del servicio Web.
+
+#### 2. Configuración en `application.yml`
+La configuración define un circuit breaker llamado accountsService en Resilience4j que se activará cuando el 50% de las últimas 10 llamadas fallen, siempre que haya al menos 5 llamadas evaluadas. Una vez abierto, permanecerá 10 segundos antes de permitir hasta 3 llamadas de prueba en estado half-open para comprobar si el servicio se ha recuperado.
+
+#### 3. Modificaciones en `WebAccountsService`
+- Inyección de `CircuitBreakerFactory<?, ?>`
+- Métodos `findByNumber()` y `byOwnerContains()` envueltos con circuit breaker
+- Métodos de fallback que devuelven respuestas por defecto cuando el servicio falla
+
+### Screenshots
+
+#### Estado CLOSED (funcionamiento normal)
+![Circuit Breaker Closed](docs/screenshots/circuit-breaker-closed.png)
+
+#### Estado OPEN (servicio caído)
+![Circuit Breaker Closed](docs/screenshots/circuit-breaker-open.png)
+
+#### Estado HALF-OPEN (probando recuperación)
+![Circuit Breaker Half-Open](docs/screenshots/circuit-breaker-half-open.png)
+
+#### Eventos del circuit breaker
+![Circuit Breaker Events](docs/screenshots/circuit-breaker-events.png)
+
+### Estados del Circuit Breaker
+| Estado | Descripción | Comportamiento |
+|--------|-------------|----------------|
+| **CLOSED** | Funcionamiento normal | Todas las peticiones pasan al servicio accounts |
+| **OPEN** | Servicio fallando | Peticiones fallan inmediatamente con respuesta de fallback |
+| **HALF_OPEN** | Probando recuperación | Permite algunas peticiones para verificar si el servicio se recuperó |
+
+### Endpoints de monitorización
+- Circuit Breakers: http://localhost:4444/actuator/circuitbreakers
+- Eventos: http://localhost:4444/actuator/circuitbreakerevents
+- Métricas: http://localhost:4444/actuator/metrics/resilience4j.circuitbreaker.state
+
+### Beneficios
+- **Prevención de fallos en cascada**: Produce fallos rápidos sin sobrecargar servicios caídos
+- **Degradación controlada**: Respuestas de fallback en lugar de errores
+- **Recuperación automática**: Detecta cuando el servicio vuelve a estar disponible
+
+### Referencias
+- https://www.geeksforgeeks.org/advance-java/spring-boot-circuit-breaker-pattern-with-resilience4j/
+- https://www.baeldung.com/spring-boot-resilience4j
+- https://spring.io/projects/spring-cloud-circuitbreaker
+- https://www.youtube.com/watch?v=OxGr2eB911s
+---
 ## Additional Notes
 
 Any other observations or comments about the assignment.
