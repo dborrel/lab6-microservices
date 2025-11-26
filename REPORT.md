@@ -45,10 +45,25 @@ Describe the changes you made to the configuration:
 
 ![Eureka Dashboard](docs/screenshots/eureka-dashboard.png)
 
-Describe what the Eureka dashboard shows:
+**Describe what the Eureka dashboard shows:**
+    El Eureka Dashboard proporciona una vista general del estado del servidor Eureka y de las instancias registradas dentro del sistema de microservicios. La información presentada permite monitorizar disponibilidad, salud de los servicios, y el estado general del entorno.
 
-- Which services are registered?
-- What information does Eureka track for each instance?
+    Contiene tres secciones:
+        - System Status - Muestra el estado general del servidor Eureka (Environment, Data center, Uptime, etc.)
+        - DS Replicas - Lista las instancias registradas en Eureka.
+        - General Info - Contiene datos internos del servidor Eureka (total-avail-memory, num-of-cpus, etc.)
+        - Instance Info - Información específica sobre la propia instancia del servidor Eureka (ipAddr, status)
+
+**- Which services are registered?**
+    - ACCOUNTS-SERVICE
+    - CONFIGSERVER
+    - WEB-SERVICE
+**- What information does Eureka track for each instance?**
+    - Nombre de la aplicación (Application ID)
+    - AMIs (Amazon Machine Images)
+    - Availability Zones
+    - Estado de la instancia (UP, DOWN)
+    - Dirección de la instancia (IP:app-name:port)
 
 ---
 
@@ -58,9 +73,12 @@ Describe what the Eureka dashboard shows:
 
 Answer the following questions:
 
-- What happens when you start a second instance of the accounts service?
-- How does Eureka handle multiple instances?
-- How does client-side load balancing work with multiple instances?
+- **What happens when you start a second instance of the accounts service?**
+    La segunda instancia se registra en Eureka con el mismo nombre (ACCOUNTS-SERVICE) pero distinto Instance ID, la primera instancia se registra en el puerto 3333 y la segunda en el 2222. Ambas instancias coexisten independientemente.
+- **How does Eureka handle multiple instances?**
+    Eureka mantiene una lista de todas las instancias bajo el mismo nombre de servicio, pero cada instancia tiene un ID único se monitorizan de forma independiente.
+- **How does client-side load balancing work with multiple instances?**
+    El Web Service obtiene un listado con todas las instancias disponibles de Eureka, de forma que Spring Cloud LoadBalancer usa Round Robin por defecto: alterna entre instancias secuncialmente (Request 1 -> 3333, Request 2 -> 2222, Request 3 -> 3333, etc.)
 
 ---
 
