@@ -124,7 +124,7 @@ Summarize what you learned about:
 
 ### Beneficios
 - **Documentación interactiva**: Los desarrolladores pueden probar los endpoints directamente desde el navegador.
-- **Auto-generado**: La documentación se actualiza atuomaticamente cuando hay cambios en el código.
+- **Auto-generado**: La documentación se actualiza atuomáticamente cuando hay cambios en el código.
 - **Reduce el trabajo manual**: No es necesaria mantener una documentación manual de la API, de esta forma se realiza automaticamente.
 
 ### Endpoints de acceso
