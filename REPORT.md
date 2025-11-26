@@ -116,10 +116,13 @@ Summarize what you learned about:
 
 ### Screenshots
 
+#### Accounts API Documentation
 ![Accounts API Documentation](docs/screenshots/swagger-accounts.png)
 
+#### Web API Documentation
 ![Web API Documentation](docs/screenshots/swagger-web.png)
 
+#### API Testing Example
 ![API Testing Example](docs/screenshots/swagger-test.png)
 
 ### Beneficios
