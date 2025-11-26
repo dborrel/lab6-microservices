@@ -20,10 +20,50 @@ spring:
 # 2. Eureka is available at the default location (http://localhost:8761/eureka/)
 # The web service will automatically register with Eureka and discover other services.
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        event-consumer-buffer-size: 10
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.HttpClientErrorException
+    instances:
+      accountsService:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+    instances:
+      accountsService:
+        base-config: default
+
 management:
   endpoints:
     web:
       exposure:
-        # Exposes Actuator endpoints for health checks and metrics.
-        include: "*" # Enable all endpoints by default
-
+        include: health,info,metrics,circuitbreakers,circuitbreakerevents
+  health:
+    circuitbreakers:
+      enabled: true
+    defaults:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true

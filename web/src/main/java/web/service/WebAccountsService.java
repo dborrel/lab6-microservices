@@ -1,10 +1,14 @@
 package web.service;
 
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import web.model.Account;
 
 import jakarta.annotation.PostConstruct;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,16 +32,15 @@ import java.util.logging.Logger;
 public class WebAccountsService {
 
     private final RestTemplate restTemplate;
-
     private final String serviceUrl;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
+    private final Logger logger = Logger.getLogger(WebAccountsService.class.getName());
 
-    private final Logger logger = Logger.getLogger(WebAccountsService.class
-            .getName());
-
-    public WebAccountsService(String serviceUrl, RestTemplate restTemplate) {
-        this.serviceUrl = serviceUrl.startsWith("http") ? serviceUrl
-                : "http://" + serviceUrl;
+    public WebAccountsService(String serviceUrl, RestTemplate restTemplate, 
+                             CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+        this.serviceUrl = serviceUrl.startsWith("http") ? serviceUrl : "http://" + serviceUrl;
         this.restTemplate = restTemplate;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     /**
@@ -64,50 +67,72 @@ public class WebAccountsService {
     }
 
     /**
-     * Finds an account by account number by calling the Accounts microservice.
-     *
-     * This method demonstrates service-to-service communication:
-     * - The serviceUrl (e.g., "http://ACCOUNTS-SERVICE") is resolved by Eureka
-     * - RestTemplate automatically handles service discovery and load balancing
-     * - If the Accounts service is unavailable, this will throw an exception
-     *   (consider implementing a circuit breaker for production)
-     *
-     * @param accountNumber The 9-digit account number
-     * @return The account if found
+     * Finds an account by number with circuit breaker protection.
+     * Falls back to a default account if the service is unavailable.
      */
     public Account findByNumber(String accountNumber) {
-
         logger.info("findByNumber() invoked: for " + accountNumber);
-        return restTemplate.getForObject(serviceUrl + "/accounts/{number}",
-                Account.class, accountNumber);
+        
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("accountsService");
+        
+        return circuitBreaker.run(
+            () -> restTemplate.getForObject(serviceUrl + "/accounts/{number}", 
+                                           Account.class, accountNumber),
+            throwable -> {
+                logger.warning("Circuit breaker fallback for findByNumber: " + throwable.getMessage());
+                return getFallbackAccount(accountNumber);
+            }
+        );
     }
 
     /**
-     * Finds accounts by owner name (partial match) by calling the Accounts microservice.
-     *
-     * This method shows error handling in microservices:
-     * - Catches HttpClientErrorException (404) when no accounts are found
-     * - Returns null instead of throwing, allowing graceful handling
-     * - Demonstrates that service failures need to be handled explicitly
-     *
-     * @param name Partial owner name to search for
-     * @return List of matching accounts, or null if none found
+     * Finds accounts by owner name with circuit breaker protection.
+     * Returns empty list if the service is unavailable.
      */
     public List<Account> byOwnerContains(String name) {
-        logger.info("byOwnerContains() invoked:  for " + name);
-        Account[] accounts = null;
+        logger.info("byOwnerContains() invoked: for " + name);
+        
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("accountsService");
+        
+        return circuitBreaker.run(
+            () -> {
+                try {
+                    Account[] accounts = restTemplate.getForObject(
+                        serviceUrl + "/accounts/owner/{name}", 
+                        Account[].class, name);
+                    
+                    if (accounts == null || accounts.length == 0) {
+                        return null;
+                    }
+                    return Arrays.asList(accounts);
+                } catch (HttpClientErrorException e) {
+                    return null;
+                }
+            },
+            throwable -> {
+                logger.warning("Circuit breaker fallback for byOwnerContains: " + throwable.getMessage());
+                return getFallbackAccountList(name);
+            }
+        );
+    }
 
-        try {
-            accounts = restTemplate.getForObject(serviceUrl
-                    + "/accounts/owner/{name}", Account[].class, name);
-        } catch (HttpClientErrorException e) { // 404
-            // Nothing found
-        }
+    /**
+     * Fallback method when findByNumber fails.
+     * Returns a default account indicating service unavailability.
+     */
+    private Account getFallbackAccount(String accountNumber) {
+        Account fallback = new Account();
+        fallback.setNumber(accountNumber);
+        fallback.setOwner("Service Unavailable");
+        fallback.setBalance(BigDecimal.ZERO);
+        return fallback;
+    }
 
-        if (accounts == null || accounts.length == 0) {
-            return null;
-        } else {
-            return Arrays.asList(accounts);
-        }
+    /**
+     * Fallback method when byOwnerContains fails.
+     * Returns an empty list to prevent null pointer exceptions.
+     */
+    private List<Account> getFallbackAccountList(String name) {
+        return List.of();
     }
 }

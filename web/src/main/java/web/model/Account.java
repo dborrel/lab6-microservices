@@ -22,7 +22,7 @@ public class Account {
     /**
      * Default constructor for JPA only.
      */
-    protected Account() {
+    public Account() {
         balance = BigDecimal.ZERO;
     }
 
@@ -35,7 +35,7 @@ public class Account {
      *
      * @param id The new id.
      */
-    protected void setId(long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -43,7 +43,7 @@ public class Account {
         return number;
     }
 
-    protected void setNumber(String accountNumber) {
+    public void setNumber(String accountNumber) {
         this.number = accountNumber;
     }
 
@@ -51,7 +51,7 @@ public class Account {
         return owner;
     }
 
-    protected void setOwner(String owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
@@ -59,7 +59,7 @@ public class Account {
         return balance.setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    protected void setBalance(BigDecimal value) {
+    public void setBalance(BigDecimal value) {
         balance = value;
         balance = balance.setScale(2, RoundingMode.HALF_EVEN);
     }
