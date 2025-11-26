@@ -54,11 +54,11 @@ Describe the changes you made to the configuration:
         - General Info - Contiene datos internos del servidor Eureka (total-avail-memory, num-of-cpus, etc.)
         - Instance Info - Información específica sobre la propia instancia del servidor Eureka (ipAddr, status)
 
-**- Which services are registered?**
+- ** Which services are registered?**
     - ACCOUNTS-SERVICE
     - CONFIGSERVER
     - WEB-SERVICE
-**- What information does Eureka track for each instance?**
+- ** What information does Eureka track for each instance?**
     - Nombre de la aplicación (Application ID)
     - AMIs (Amazon Machine Images)
     - Availability Zones
@@ -88,34 +88,38 @@ Answer the following questions:
 
 ![Error Screenshot](docs/screenshots/failure-error.png)
 
-Describe what happens immediately after stopping the accounts service on port 3333.
+**Describe what happens immediately after stopping the accounts service on port 3333.**
+    Cuando se detiene la instancia del puerto 3333, la mitad de las peticiones fallan (Connection refused). Las peticiones dirigidas a 2222 siguen funcionando correctamente. El Web Service aún tiene en caché que la instancia 3333 está en estado UP.
 
 ### Eureka Instance Removal
 
 ![Instance Removal](docs/screenshots/instance-removal.png)
 
-Explain how Eureka detects and removes the failed instance:
+**Explain how Eureka detects and removes the failed instance:**
 
-- How long did it take for Eureka to remove the dead instance?
-- What mechanism does Eureka use to detect failures?
-
+- **How long did it take for Eureka to remove the dead instance?**
+    90-120 segundos desde el fallo hasta la eliminación completa.
+- **What mechanism does Eureka use to detect failures?**
+    Eureka espera que llegue un heartbeat cada 30 segundos, después de 3 heartbeats perdidos (90 segundos), marca la instancia con el estado DOWN. Depués el Web Service refresca su caché (30s) y deja de enviar peticiones a 3333.
 ---
 
 ## 6. Service Recovery Analysis (Task 6)
 
 ![Recovery State](docs/screenshots/recovery.png)
 
-Answer the following questions:
+**Answer the following questions:**
 
-- Why does the web service eventually recover?
-- How long did recovery take?
-- What role does client-side caching play in the recovery process?
-
+- **Why does the web service eventually recover?**
+    Después de detectar el fallo, Eureka elimina la instancia caída (3333) de su registro. Después, el Web Service actualiza su cache y obtiene solo la instancia disponible (2222). A partir de ahí, todas las peticiones se dirigen automáticamente a 2222.
+- **How long did recovery take?**
+    90-120 segundos desde el fallo hasta la recuperación completa.
+- **What role does client-side caching play in the recovery process?**
+    El cliente ya no consulta Eureka en cada petición, por lo que reduce la carga en el servidor Eureka.
 ---
 
 ## 7. Conclusions
 
-Summarize what you learned about:
+**Summarize what you learned about:**
 
 - Microservices architecture
 - Service discovery with Eureka
