@@ -104,6 +104,34 @@ Summarize what you learned about:
 
 ---
 
+## 9. Bonus 1: RESTful API Documentation
+
+**Implementación:** SpringDoc OpenAPI 3 con Swagger UI
+
+### Detalles de implementación
+- Se ha añadido la de dependecia de SpringDoc a los servicios `acounts` y `web`.
+- Se ha creado la clase `OpenApiConfig` en los dos servicios para configurar los metadatos de la API.
+- Se han modificado los controladores para añadir anotaciones OpenAPI para documentación detallada.
+- Se han habilitado pruebas de API interactivas a través de Swagger UI.
+
+### Screenshots
+
+![Accounts API Documentation](docs/screenshots/swagger-accounts.png)
+
+![Web API Documentation](docs/screenshots/swagger-web.png)
+
+![API Testing Example](docs/screenshots/swagger-test.png)
+
+### Beneficios
+- **Documentación interactiva**: Los desarrolladores pueden probar los endpoints directamente desde el navegador.
+- **Auto-generado**: La documentación se actualiza atuomaticamente cuando hay cambios en el código.
+- **Reduce el trabajo manual**: No es necesaria mantener una documentación manual de la API, de esta forma se realiza automaticamente.
+
+### Endpoints de acceso
+- Accounts Service: http://localhost:3333/swagger-ui.html
+- Web Service: http://localhost:4444/swagger-ui.html
+
+---
 ## Additional Notes
 
 Any other observations or comments about the assignment.

@@ -17,4 +17,6 @@ dependencies {
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.cloud.starter.netflix.eureka.client)
     implementation(libs.spring.cloud.starter.config)
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 }
