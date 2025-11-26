@@ -7,8 +7,13 @@
 
 Describe the changes you made to the configuration:
 
-- What did you modify in `accounts-service.yml`?
-- Why is externalized configuration useful in microservices?
+- **What did you modify in `accounts-service.yml`?**
+    He modificado `accounts-service.yml` cambiando el puerto de 3333 a 2222 en la tarea 3.
+    Para realizar el bonus RESTful API Documentation he vuelto a la configuración inicial.
+- **Why is externalized configuration useful in microservices?**
+    - Permite cambiar la configuración sin tener que recompilar el código.
+    - Permite realizar una gestión centralizadad desde un único punto de todos los microservicios.
+    - Permite ejecutar multiples instancias con distintos puertos.
 
 ---
 
@@ -18,13 +23,21 @@ Describe the changes you made to the configuration:
 
 ![Accounts Registration Log](docs/screenshots/accounts-registration.png)
 
-Explain what happens during service registration.
+**Explain what happens during service registration.**
+    1. Lee su configuración del Config Server.
+    2. Se registra en Eureka enviando su nombre, IP y puerto.
+    3. Recibe el código 204 confirmando que se ha registrado con éxito.
+    4. Empieza a enviar heartbeats cada 30 segundos. 
 
 ### Web Service Registration
 
 ![Web Registration Log](docs/screenshots/web-registration.png)
 
-Explain how the web service discovers the accounts service.
+**Explain how the web service discovers the accounts service.**
+    1. Se registra en Eureka de la misma forma que el servicio Accounts.
+    2. Utiliza `@LoadBlanced RestTemplate` para llamar a `http://ACCOUNTS-SERVICE/accounts`.
+    3. Spring Cloud LoadBalancer realiza la consulta a Eureka para obtener las instancias disponibles.
+    4. Selecciona una instancia automáticamente y reemplaza el nombre lógico por la IP:puerto real
 
 ---
 
