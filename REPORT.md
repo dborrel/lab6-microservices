@@ -1,8 +1,9 @@
 # Lab 6 Microservices - Project Report
+# David Borrel Seral - 871643
 
 ## 1. Configuration Setup
 
-**Configuration Repository**: [Link to your forked repository]
+**Configuration Repository**: https://github.com/dborrel/lab6-microservices
 
 Describe the changes you made to the configuration:
 
