@@ -95,8 +95,6 @@ Answer the following questions:
 
 ![Instance Removal](docs/screenshots/instance-removal.png)
 
-Esta captura no se ha podido sacar ya que el ACCOUNTS-SERVICE del puerto 3333 no pasa por el estado DOWN en el dashboard de Eureka, durante 90-120 segundos (3 heartbeats perdidos) sigue apareciendo como UP y pasado ese tiempo ya desaparece del Dashboard.
-
 **Explain how Eureka detects and removes the failed instance:**
 
 - **How long did it take for Eureka to remove the dead instance?**
