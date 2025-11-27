@@ -134,6 +134,11 @@ Summarize what you learned about:
 - Accounts Service: http://localhost:3333/swagger-ui.html
 - Web Service: http://localhost:4444/swagger-ui.html
 
+### Referencias
+- https://spring.io/guides/gs/testing-restdocs
+- https://www.baeldung.com/spring-rest-openapi-documentation
+- https://www.geeksforgeeks.org/springboot/spring-boot-rest-api-documentation-using-swagger/
+
 ---
 ## 9. Bonus 2: 10. Circuit Breaker Pattern
 
