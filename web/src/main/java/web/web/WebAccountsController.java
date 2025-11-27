@@ -1,5 +1,12 @@
 package web.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +39,10 @@ import java.util.logging.Logger;
  * @author Paul Chapman
  */
 @Controller
+@Tag(
+    name = "Web Accounts", 
+    description = "MVC endpoints for account search and display. These endpoints render HTML views."
+)
 public class WebAccountsController {
 
     private final WebAccountsService accountsService;
@@ -50,12 +61,43 @@ public class WebAccountsController {
     }
 
     @RequestMapping("/accounts")
+    @Operation(
+        summary = "Account home page",
+        description = "Returns the main accounts page HTML view"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully returned home page",
+        content = @Content(mediaType = "text/html")
+    )
     public String goHome() {
         return "index";
     }
 
     @RequestMapping("/accounts/{accountNumber}")
+    @Operation(
+        summary = "View account details by number",
+        description = "Retrieves and displays account details for a specific 9-digit account number. " +
+                     "This endpoint calls the Accounts microservice via service discovery."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Account found and displayed",
+            content = @Content(mediaType = "text/html")
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Account not found",
+            content = @Content(mediaType = "text/html")
+        )
+    })
     public String byNumber(Model model,
+                           @Parameter(
+                               description = "9-digit account number",
+                               required = true,
+                               example = "123456789"
+                           )
                            @PathVariable("accountNumber") String accountNumber) {
 
         logger.info("web-service byNumber() invoked: " + accountNumber);
@@ -67,7 +109,30 @@ public class WebAccountsController {
     }
 
     @RequestMapping("/accounts/owner/{text}")
-    public String ownerSearch(Model model, @PathVariable("text") String name) {
+    @Operation(
+        summary = "Search accounts by owner name",
+        description = "Searches for accounts where the owner name contains the specified text (case-insensitive). " +
+                     "Uses service discovery to call the Accounts microservice."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Search completed, results displayed",
+            content = @Content(mediaType = "text/html")
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No accounts found matching the search criteria",
+            content = @Content(mediaType = "text/html")
+        )
+    })
+    public String ownerSearch(Model model, 
+                             @Parameter(
+                                 description = "Partial or complete owner name",
+                                 required = true,
+                                 example = "Keri"
+                             )
+                             @PathVariable("text") String name) {
         logger.info("web-service byOwner() invoked: " + name);
 
         List<Account> accounts = accountsService.byOwnerContains(name);
@@ -80,14 +145,42 @@ public class WebAccountsController {
     }
 
     @RequestMapping(value = "/accounts/search", method = RequestMethod.GET)
+    @Operation(
+        summary = "Display search form",
+        description = "Returns the account search form HTML view"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Search form displayed",
+        content = @Content(mediaType = "text/html")
+    )
     public String searchForm(Model model) {
         model.addAttribute("searchCriteria", new SearchCriteria());
         return "accountSearch";
     }
 
     @RequestMapping(value = "/accounts/dosearch")
-    public String doSearch(Model model, SearchCriteria criteria,
-                           BindingResult result) {
+    @Operation(
+        summary = "Execute account search",
+        description = "Processes search form submission and redirects to appropriate results page. " +
+                     "Validates that either account number OR search text is provided (not both)."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Search executed successfully",
+            content = @Content(mediaType = "text/html")
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid search criteria - validation errors",
+            content = @Content(mediaType = "text/html")
+        )
+    })
+    public String doSearch(Model model, 
+                          @Parameter(description = "Search criteria object")
+                          SearchCriteria criteria,
+                          BindingResult result) {
         logger.info("web-service search() invoked: " + criteria);
 
         criteria.validate(result);

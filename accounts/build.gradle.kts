@@ -22,6 +22,8 @@ dependencies {
     implementation("org.springframework.data:spring-data-commons")
     implementation("org.hsqldb:hsqldb")
 
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+
     implementation(libs.spring.cloud.starter.netflix.eureka.client)
     implementation(libs.spring.cloud.starter.config)
     implementation(libs.google.gson)

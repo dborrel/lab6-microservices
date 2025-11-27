@@ -17,4 +17,13 @@ dependencies {
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.cloud.starter.netflix.eureka.client)
     implementation(libs.spring.cloud.starter.config)
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+
+    // Circuit Breaker
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    implementation("io.github.resilience4j:resilience4j-micrometer")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 }

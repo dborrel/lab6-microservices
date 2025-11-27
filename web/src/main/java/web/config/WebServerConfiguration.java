@@ -1,5 +1,6 @@
 package web.config;
 
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +36,8 @@ public class WebServerConfiguration {
      * @return A new service instance.
      */
     @Bean
-    public WebAccountsService accountsService() {
-        return new WebAccountsService(ACCOUNTS_SERVICE_URL, restTemplate());
+    public WebAccountsService accountsService(CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+        return new WebAccountsService(ACCOUNTS_SERVICE_URL, restTemplate(), circuitBreakerFactory);
     }
 
     /**
