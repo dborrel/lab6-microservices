@@ -126,16 +126,31 @@ Answer the following questions:
 - System resilience and self-healing
 - Challenges you encountered and how you solved them
 
+Esta sesión de laboratorio ha sido muy útil para poder ver como funciona una arquitectura de microservicios y como es la comunicación entre ellos. 
+
+Además esta práctica ha sido de utilidad para poner en práctica los conocimientos aprendidos en la asignatura Sistemas Distribuidos, viendo como el cliente distribuye el tráfico automáticamente entre múltiples instancias y como el sistema se auto-recupera de fallos sin intervención manual (mencanismo de heartbeats). En la asignatura de Sistemas Distribuidos se estudió el algoritmo de Raft, que también utilizaba los heartbeats para detectar fallos de las instancias.
+
+También se ha comprendido la utilidad de tener un Config Server que centraliza y simplifica la configuración de toda el sistema.
+
+Uno de los retos más complicados de esta práctica ha sido comprender la arquitectura y como funcionaba la comunicación entre microservicios, una vez se ha comprendido esto, el resto de la práctica se ha podido realizar sin problemas.
+
 ---
 
 ## 8. AI Disclosure
 
 **Did you use AI tools?** (ChatGPT, Copilot, Claude, etc.)
 
-- If YES: Which tools? What did they help with? What did you do yourself?
-- If NO: Write "No AI tools were used."
+AI Tools Used: Claude AI
 
-**Important**: Explain your own understanding of microservices patterns and Eureka behavior, even if AI helped you write parts of this report.
+Se ha utilizado esta IA para dos tareas:
+- Para comprender la arquitectura de este sistema, al principio le pedí que me dibujara unos diagramas de secuencia de esta arquitectura y que me explcará bien que hacía cada servicio y como se comunicaban entre ellos. Esto me fue muy útil para entender todo el sistema antes de ponerme a hacer las tareas.
+- También he utilizado la IA para solucionar unos errores que tenía al implementar el Circuit Breaker, el problema que tenía era que el circuit breaker no se estaba activando porque la excepción estaba ocurriendo antes de que Resilience4j pudiera interceptarla. Esto sucedía porque el @CircuitBreaker funciona mediante proxies de Spring AOP, que solo interceptan llamadas desde fuera de la clase.
+
+El resto de la práctica ha sido desarrollado por mí. Para la realización de los dos bonus, he buscado bastante documentación en la web de Spring Boot para poder ver ejemplos de implementaciones.
+
+Esta práctica ha sido de mucha utilidad para comprender como funcionan los microservicios, que permiten construir sistemas distribuidos donde cada componente funciona de manera independiente, y Eureka actúa como el intermediario que permite que estos servicios se encuentren dinámicamente sin necesidad de hadcodear IPs o puertos. 
+
+Además en el Report 2, también propuse una arquitectura de microservicios, por lo que esta sesión de laboratio me ha parecido muy interesante para poder aplicar todos los conocimientos aprendidos durante la redacción del Report 2.
 
 ---
 
