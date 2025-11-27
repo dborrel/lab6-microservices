@@ -152,6 +152,13 @@ The **Eureka Server** provides service registration and discovery.
 - **Dashboard**: <http://localhost:8761>
 - **Language**: Kotlin
 
+**Mandatory for Windows users**: keep the following setting in `discovery/src/main/resources/application.yml`:
+
+- `eureka.server.enable-self-preservation: false`
+
+This setting make Eureka evict failed instances quickly so that the failure and recovery experiments behave as described in this guide.
+On Windows it is required for the lab to work reliably. On other operating systems it is not necessary.
+
 ```bash
 ./gradlew discovery:bootRun
 ```

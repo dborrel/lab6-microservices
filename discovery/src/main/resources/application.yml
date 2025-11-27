@@ -25,6 +25,10 @@ eureka:
     # self-preservation mode and stops evicting instances (assumes network issue).
     # This prevents accidental mass eviction during network partitions.
     renewal-percent-threshold: 0.85
+    # Disable self-preservation so the demo removes failing instances immediately.
+    # In production, keep this true to protect the registry during network issues.
+    enable-self-preservation: false
+
 
 logging:
   level:
