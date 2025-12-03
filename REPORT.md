@@ -201,10 +201,14 @@ Se ha implementado el patrón Circuit Breaker para prevenir fallos en cascada cu
 ### Detalles de implementación
 
 #### 1. Dependencias añadidas
-Se han añadido las dependencias de Resilence4j en el `build.gradle.kts` del servicio Web.
+Se han añadido las dependencias de Resilience4j en el `build.gradle.kts` del servicio Web:
+- `spring-cloud-starter-circuitbreaker-resilience4j`
+- `resilience4j-retry` (para mecanismo de reintentos)
 
 #### 2. Configuración en `application.yml`
 La configuración define un circuit breaker llamado accountsService en Resilience4j que se activará cuando el 50% de las últimas 10 llamadas fallen, siempre que haya al menos 5 llamadas evaluadas. Una vez abierto, permanecerá 10 segundos antes de permitir hasta 3 llamadas de prueba en estado half-open para comprobar si el servicio se ha recuperado.
+
+Adicionalmente, se ha configurado un mecanismo de **retry con jitter** que realiza hasta 3 intentos (1 inicial + 2 reintentos) antes de que el circuit breaker evalúe el fallo. Los reintentos utilizan **backoff exponencial** (1s, 2s, 4s) con **jitter aleatorio** (±50%) para evitar el "thundering herd problem", distribuyendo los reintentos en el tiempo y previniendo que múltiples clientes sobrecarguen el servicio simultáneamente cuando se recupera.
 
 #### 3. Modificaciones en `WebAccountsService`
 - Inyección de `CircuitBreakerFactory<?, ?>`

@@ -1,5 +1,6 @@
 package web.config;
 
+import io.github.resilience4j.retry.RetryRegistry;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
@@ -36,8 +37,10 @@ public class WebServerConfiguration {
      * @return A new service instance.
      */
     @Bean
-    public WebAccountsService accountsService(CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
-        return new WebAccountsService(ACCOUNTS_SERVICE_URL, restTemplate(), circuitBreakerFactory);
+    public WebAccountsService accountsService(CircuitBreakerFactory<?, ?> circuitBreakerFactory,
+                                             RetryRegistry retryRegistry) {
+        return new WebAccountsService(ACCOUNTS_SERVICE_URL, restTemplate(), 
+                                     circuitBreakerFactory, retryRegistry);
     }
 
     /**

@@ -39,6 +39,26 @@ resilience4j:
     instances:
       accountsService:
         base-config: default
+  
+  # Configuración de Retry
+  retry:
+    configs:
+      default:
+        max-attempts: 3 # Número máximo de intentos (incluyendo el intento inicial)
+        wait-duration: 1s # Tiempo de espera entre reintentos
+        enable-exponential-backoff: true # Activa backoff exponencial
+        exponential-backoff-multiplier: 2 # Multiplica el wait-duration por 2 en cada reintento
+        enable-random-wait: true # Activa jitter (añade aleatoriedad al tiempo de espera)
+        random-wait-factor: 0.5 # Factor de aleatoriedad (0.5 = ±50% del wait-duration)
+        retry-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+        ignore-exceptions:
+          - org.springframework.web.client.HttpClientErrorException
+    instances:
+      accountsService:
+        base-config: default
+
   timelimiter:
     configs:
       default:
