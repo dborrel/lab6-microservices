@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
+    id("org.openapi.generator") version "7.2.0"
 }
 
 repositories {
@@ -26,4 +27,35 @@ dependencies {
 
     implementation("io.github.resilience4j:resilience4j-micrometer")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    
+    // OpenAPI Generator dependencies
+    implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+}
+
+openApiGenerate {
+    generatorName.set("java")
+    inputSpec.set("$projectDir/accounts-api.json")
+    outputDir.set(layout.buildDirectory.dir("generated").get().asFile.path)
+    apiPackage.set("web.client.api")
+    modelPackage.set("web.client.model")
+    configOptions.set(mapOf(
+        "dateLibrary" to "java8",
+        "library" to "resttemplate",
+        "useSpringBoot3" to "true",
+        "useJakartaEe" to "true"
+    ))
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(layout.buildDirectory.dir("generated/src/main/java"))
+        }
+    }
+}
+
+tasks.named("compileJava") {
+    dependsOn("openApiGenerate")
 }

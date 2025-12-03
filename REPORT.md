@@ -165,6 +165,52 @@ Además en el Report 2, también propuse una arquitectura de microservicios, por
 - Se han modificado los controladores para añadir anotaciones OpenAPI para documentación detallada.
 - Se han habilitado pruebas de API interactivas a través de Swagger UI.
 
+### Cliente Auto-generado (OpenAPI Generator)
+Se ha implementado generación automática de cliente API usando el plugin OpenAPI Generator:
+
+**Configuración en `web/build.gradle.kts`:**
+```kotlin
+plugins {
+    id("org.openapi.generator") version "7.2.0"
+}
+
+dependencies {
+    implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+}
+
+openApiGenerate {
+    generatorName.set("java")
+    inputSpec.set("$projectDir/accounts-api.json")
+    outputDir.set(layout.buildDirectory.dir("generated").get().asFile.path)
+    apiPackage.set("web.client.api")
+    modelPackage.set("web.client.model")
+    configOptions.set(mapOf(
+        "dateLibrary" to "java8",
+        "library" to "resttemplate",
+        "useSpringBoot3" to "true",
+        "useJakartaEe" to "true"
+    ))
+}
+```
+
+**Proceso de generación:**
+1. Descargar especificación OpenAPI del servicio Accounts:
+   ```bash
+   curl http://localhost:3333/v3/api-docs -o web/accounts-api.json
+   ```
+
+2. Generar cliente automáticamente:
+   ```bash
+   ./gradlew :web:openApiGenerate
+   ```
+
+3. El cliente generado incluye:
+   - `AccountsApi.java`: Interfaz del cliente con todos los métodos
+   - `Account.java`: Modelos de datos
+   - `ApiClient.java`: Configuración HTTP
+
 ### Screenshots
 
 #### Accounts API Documentation
@@ -189,6 +235,7 @@ Además en el Report 2, también propuse una arquitectura de microservicios, por
 - https://spring.io/guides/gs/testing-restdocs
 - https://www.baeldung.com/spring-rest-openapi-documentation
 - https://www.geeksforgeeks.org/springboot/spring-boot-rest-api-documentation-using-swagger/
+- https://github.com/Galacsh/spring-boot-boilerplate/blob/91b069f5d6abf7a23af337d2d6913d2980355fa0/springdoc/build.gradle.kts#L68
 
 ---
 ## 9. Bonus 2: 10. Circuit Breaker Pattern
