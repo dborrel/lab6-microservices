@@ -32,11 +32,16 @@ dependencies {
     implementation("org.openapitools:jackson-databind-nullable:0.2.6")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+
+    // Testing dependencies
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 openApiGenerate {
     generatorName.set("java")
-    inputSpec.set("$projectDir/accounts-api.json")
+    inputSpec.set("$projectDir/web-api.json")
     outputDir.set(layout.buildDirectory.dir("generated").get().asFile.path)
     apiPackage.set("web.client.api")
     modelPackage.set("web.client.model")
@@ -58,4 +63,14 @@ sourceSets {
 
 tasks.named("compileJava") {
     dependsOn("openApiGenerate")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    dependsOn("openApiGenerate")
+    
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
 }
